@@ -1,0 +1,70 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
+#include <cctype>      // Include this for std::tolower
+#include <limits>     // Include this for std::numeric_limits
+
+int main() {
+    // Initialize random seed
+    std::srand(static_cast<unsigned int>(std::time(0)));
+
+    // List of words to choose from
+    std::vector<std::string> words = {"apple", "banana", "cherry", "date", "elderberry"};
+    
+    // Randomly select a word from the list
+    std::string selectedWord = words[std::rand() % words.size()];
+    std::string guessedWord(selectedWord.length(), '_'); // To show unguessed letters
+
+    int lives = 3;
+    char guess;
+    std::cout << "Welcome to the letter guessing game!" << std::endl;
+
+    // Game loop
+    while (lives > 0) {
+        std::cout << "\nCurrent word: " << guessedWord << std::endl;
+        std::cout << "You have " << lives << " lives remaining." << std::endl;
+        std::cout << "Please enter a letter: ";
+        std::cin >> guess;
+
+        // Check if the input is a single character
+        if (std::cin.fail() || !std::isalpha(guess) || std::cin.peek() != '\n') {
+            std::cin.clear(); // Clear the error flag
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignore the rest of the line
+            std::cout << "Please enter a valid single letter." << std::endl;
+            continue; // Skip the rest of the loop iteration
+        }
+
+        // Convert guess to lowercase to handle case sensitivity
+        guess = std::tolower(guess);
+        bool found = false;
+
+        // Check if the guessed letter is in the selected word
+        for (size_t i = 0; i < selectedWord.length(); ++i) {
+            if (selectedWord[i] == guess) {
+                guessedWord[i] = guess; // Update guessed word
+                found = true;
+            }
+        }
+
+        // If the letter was not found, reduce lives
+        if (!found) {
+            lives--;
+            std::cout << "Wrong guess!" << std::endl;
+        }
+
+        // Check if the word has been completely guessed
+        if (guessedWord == selectedWord) {
+            std::cout << "\nCongratulations! You've guessed the word: " << selectedWord << std::endl;
+            break;
+        }
+    }
+
+    // If the player runs out of lives
+    if (lives == 0) {
+        std::cout << "\nGame over! The word was: " << selectedWord << std::endl;
+    }
+
+    return 0;
+}
